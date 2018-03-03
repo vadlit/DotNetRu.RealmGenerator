@@ -5,4 +5,9 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Realm" Version="2.1.0" />
+    <PackageReference Include="Realm.Database" Version="2.1.0" />
+  </ItemGroup>
+
 </Project>
