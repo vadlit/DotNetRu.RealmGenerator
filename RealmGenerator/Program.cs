@@ -2,11 +2,6 @@
 {
     using Realms;
 
-    public class Speaker : RealmObject
-    {
-        public string Name { get; set; }
-    }
-
     public class Program
     {
         public static void Main(string[] args)
