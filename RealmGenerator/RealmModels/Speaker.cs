@@ -1,8 +1,8 @@
-﻿namespace RealmGenerator.Models
+﻿namespace RealmGenerator.RealmModels
 {
     using Realms;
 
-    public class SpeakerModel : RealmObject
+    public class Speaker : RealmObject
     {
         public string Id { get; set; }
 

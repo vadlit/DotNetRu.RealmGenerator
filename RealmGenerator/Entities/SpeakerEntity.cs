@@ -1,8 +1,6 @@
-﻿namespace RealmGenerator.Models
+﻿namespace RealmGenerator.Entities
 {
     using System.Xml.Serialization;
-
-    using Realms;
 
     [XmlType("Speaker")]
     public class SpeakerEntity

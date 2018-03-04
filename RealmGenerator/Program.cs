@@ -4,7 +4,8 @@
 
     using AutoMapper;
 
-    using RealmGenerator.Models;
+    using RealmGenerator.Entities;
+    using RealmGenerator.RealmModels;
 
     using Realms;
 
@@ -12,19 +13,29 @@
     {
         public static void Main(string[] args)
         {
-            Mapper.Initialize(cfg => { cfg.CreateMap<SpeakerEntity, SpeakerModel>(); });
+            Mapper.Initialize(
+                cfg =>
+                    {
+                        cfg.CreateMap<SpeakerEntity, Speaker>();
+                        cfg.CreateMap<VenueEntity, Venue>();
+                    });
 
             var config = new RealmConfiguration("C:\\Users\\User\\Desktop\\Audit.realm");
 
             var realm = Realm.GetInstance(config);
 
-            var speakers = AuditHelper.GetSpeakers().ToList();
-
-            foreach (SpeakerEntity speakerEntity in speakers)
+            foreach (SpeakerEntity speakerEntity in AuditHelper.GetSpeakers())
             {
-                var speakerModel = Mapper.Map<SpeakerModel>(speakerEntity);
+                var speaker = Mapper.Map<Speaker>(speakerEntity);
 
-                realm.Write(() => { realm.Add(speakerModel); });
+                realm.Write(() => { realm.Add(speaker); });
+            }
+
+            foreach (VenueEntity venueEntity in AuditHelper.GetVenues())
+            {
+                var venue = Mapper.Map<Venue>(venueEntity);
+
+                realm.Write(() => { realm.Add(venue); });
             }
         }
     }

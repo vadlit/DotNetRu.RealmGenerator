@@ -1,9 +1,8 @@
-﻿namespace RealmGenerator.Entities
+﻿namespace RealmGenerator.RealmModels
 {
-    using System.Xml.Serialization;
+    using Realms;
 
-    [XmlType("Venue")]
-    public class VenueEntity
+    public class Venue : RealmObject
     {
         public string Id { get; set; }
 

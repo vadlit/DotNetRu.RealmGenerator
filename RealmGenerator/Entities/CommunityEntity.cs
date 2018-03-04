@@ -1,4 +1,4 @@
-﻿namespace RealmGenerator.Models
+﻿namespace RealmGenerator.Entities
 {
     using System.Xml.Serialization;
 

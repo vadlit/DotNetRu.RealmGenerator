@@ -1,9 +1,7 @@
-﻿namespace DotNetRu.DataStore.Audit.Entities
+﻿namespace RealmGenerator.Entities
 {
     using System;
     using System.Xml.Serialization;
-
-    using Realms;
 
     [XmlType("Meetup")]
     public class MeetupEntity
