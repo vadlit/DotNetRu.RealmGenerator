@@ -5,8 +5,6 @@
     using System.Xml;
     using System.Xml.Serialization;
 
-    using RealmGenerator.Entities;
-
     public class AuditHelper
     {
         private static string auditPath = "C:\\Users\\User\\source\\repos\\Audit\\db";
@@ -19,25 +17,14 @@
             return (T)xmlSerializer.Deserialize(xmlReader);
         }
 
-        public static IEnumerable<SpeakerEntity> GetSpeakers()
+        public static IEnumerable<T> GetEntities<T>(string folderName)
         {
-            foreach (var speakerPath in Directory.EnumerateFiles(
-                Path.Combine(auditPath, "speakers"),
+            foreach (var filePath in Directory.EnumerateFiles(
+                Path.Combine(auditPath, folderName),
                 "*.xml",
                 SearchOption.AllDirectories))
             {
-                yield return LoadFromFile<SpeakerEntity>(speakerPath);
-            }
-        }
-
-        public static IEnumerable<VenueEntity> GetVenues()
-        {
-            foreach (var venuePath in Directory.EnumerateFiles(
-                Path.Combine(auditPath, "venues"),
-                "*.xml",
-                SearchOption.AllDirectories))
-            {
-                yield return LoadFromFile<VenueEntity>(venuePath);
+                yield return LoadFromFile<T>(filePath);
             }
         }
     }

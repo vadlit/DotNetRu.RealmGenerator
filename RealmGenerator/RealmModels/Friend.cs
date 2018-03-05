@@ -1,9 +1,8 @@
-﻿namespace RealmGenerator.Entities
+﻿namespace RealmGenerator.RealmModels
 {
-    using System.Xml.Serialization;
+    using Realms;
 
-    [XmlType("Friend")]
-    public class FriendEntity
+    public class Friend : RealmObject
     {
         public string Id { get; set; }
 

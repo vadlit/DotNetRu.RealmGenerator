@@ -2,11 +2,8 @@
 {
     using System.Xml.Serialization;
 
-    using Realms;
-
-    [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = false)]
-    public class CommunityEntity : RealmObject
+    [XmlType("Community")]
+    public class CommunityEntity
     {
         public string Id { get; set; }
 
