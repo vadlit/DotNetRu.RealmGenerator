@@ -7,7 +7,7 @@
 
     public class AuditHelper
     {
-        private static string auditPath = "C:\\Users\\User\\source\\repos\\Audit\\db";
+        private static string auditPath = @"C:\Users\User\source\repos\Audit\db";
 
         public static T LoadFromFile<T>(string path)
         {
@@ -26,6 +26,11 @@
             {
                 yield return LoadFromFile<T>(filePath);
             }
+        }
+
+        public static byte[] LoadImage(string directoryName, string entityId, string fileName)
+        {
+            return File.ReadAllBytes(Path.Combine(auditPath, directoryName, entityId, fileName));
         }
     }
 }

@@ -11,5 +11,9 @@
         public string Url { get; set; }
 
         public string Description { get; set; }
+
+        public byte[] LogoSmall { get; set; }
+
+        public byte[] Logo { get; set; }
     }
 }

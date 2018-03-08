@@ -22,5 +22,9 @@
         public string HabrUrl { get; set; }
 
         public string ContactsUrl { get; set; }
+
+        public byte[] AvatarSmall { get; set; }
+
+        public byte[] Avatar { get; set; }
     }
 }
