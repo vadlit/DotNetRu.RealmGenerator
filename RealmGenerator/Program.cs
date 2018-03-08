@@ -16,7 +16,7 @@
         {
             IList<int> dummy = new List<int>();
 
-            string realmDirectoryPath = @"C:/Users/User/Desktop/Audit";
+            string realmDirectoryPath = @"C:\Users\User\Source\Repos\App\DotNetRu.DataStore.Audit";
 
             CleanDirectory(realmDirectoryPath);
 
@@ -82,11 +82,8 @@
 
         private static void CleanDirectory(string realmDirectoryPath)
         {
-            var directoryInfo = new DirectoryInfo(realmDirectoryPath);
-            foreach (FileInfo file in directoryInfo.GetFiles())
-            {
-                file.Delete();
-            }
+            File.Delete(Path.Combine(realmDirectoryPath, "Audit.realm"));
+            File.Delete(Path.Combine(realmDirectoryPath, "Audit.realm.lock"));
         }
     }
 }
