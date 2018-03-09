@@ -69,6 +69,8 @@
                                         var friend = realm.Find<Friend>(friendId);
                                         dest.Friends.Add(friend);
                                     }
+
+                                    dest.Venue = realm.Find<Venue>(src.VenueId);
                                 });
                     });
 
