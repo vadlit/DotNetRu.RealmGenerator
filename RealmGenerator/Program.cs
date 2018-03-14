@@ -30,10 +30,7 @@
                         cfg.CreateMap<SpeakerEntity, Speaker>().AfterMap(
                             (src, dest) =>
                                 {
-                                    var speakerId = src.Id;
-
-                                    dest.AvatarSmall = AuditHelper.LoadImage("speakers", speakerId, "avatar.small.jpg");
-                                    dest.Avatar = AuditHelper.LoadImage("speakers", speakerId, "avatar.jpg");
+                                    dest.Avatar = AuditHelper.LoadImage("speakers", src.Id, "avatar.jpg");
                                 });
                         cfg.CreateMap<VenueEntity, Venue>();
                         cfg.CreateMap<FriendEntity, Friend>().AfterMap(
