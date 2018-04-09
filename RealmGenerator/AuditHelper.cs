@@ -7,7 +7,7 @@
 
     public class AuditHelper
     {
-        private static string auditPath = @"C:\Users\User\source\repos\Audit\db";
+        public const string AuditPath = @"C:\Users\User\source\repos\Audit";
 
         public static T LoadFromFile<T>(string path)
         {
@@ -20,7 +20,7 @@
         public static IEnumerable<T> GetEntities<T>(string folderName)
         {
             foreach (var filePath in Directory.EnumerateFiles(
-                Path.Combine(auditPath, folderName),
+                Path.Combine(AuditPath, "db", folderName),
                 "*.xml",
                 SearchOption.AllDirectories))
             {
@@ -30,7 +30,7 @@
 
         public static byte[] LoadImage(string directoryName, string entityId, string fileName)
         {
-            return File.ReadAllBytes(Path.Combine(auditPath, directoryName, entityId, fileName));
+            return File.ReadAllBytes(Path.Combine(AuditPath, "db", directoryName, entityId, fileName));
         }
     }
 }
