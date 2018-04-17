@@ -91,24 +91,30 @@
                     cfg.CreateMap<MeetupEntity, Meetup>().AfterMap(
                         (src, dest) =>
                         {
-                            foreach (var session in src.Sessions)
+                            realm.Write(() =>
                             {
-                                var realmSession = Mapper.Map<Session>(session);
-                                //realmSession.Meetup = dest;
-                                var talk = realm.Find<Talk>(session.TalkId);
-                                realmSession.Talk = talk;
-                                realm.Write(() => { realm.Add(realmSession); });
-                                var s = realm.Find<Session>(session.TalkId);
-                                dest.Sessions.Add(s);
-                            }
+                                foreach (var session in src.Sessions)
+                                {
+                                    var realmSession = Mapper.Map<Session>(session);
+                                    var talk = realm.Find<Talk>(session.TalkId);
 
-                            foreach (string friendId in src.FriendIds)
-                            {
-                                var friend = realm.Find<Friend>(friendId);
-                                dest.Friends.Add(friend);
-                            }
+                                    realmSession.Talk = talk;
+                                    talk.Session = realmSession;
+                                    realmSession.Meetup = dest;
+                                    
+                                    var s = realm.Add(realmSession);
+                                    dest.Sessions.Add(s);
 
-                            dest.Venue = realm.Find<Venue>(src.VenueId);
+                                }
+
+                                foreach (string friendId in src.FriendIds)
+                                {
+                                    var friend = realm.Find<Friend>(friendId);
+                                    dest.Friends.Add(friend);
+                                }
+
+                                dest.Venue = realm.Find<Venue>(src.VenueId);
+                            });
                         });
                 });
         }

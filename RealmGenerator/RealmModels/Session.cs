@@ -15,7 +15,6 @@
 
         public DateTimeOffset EndTime { get; set; }
 
-        //[Backlink(nameof(RealmModels.Meetup.Sessions))]
-        //public IQueryable<Meetup> Meetup { get; }
+        public Meetup Meetup { get; set; }
     }
 }

@@ -21,6 +21,8 @@
         public string SlidesUrl { get; set; }
 
         public string VideoUrl { get; set; }
+
+        public Session Session { get; set; }
     }
 }
 
