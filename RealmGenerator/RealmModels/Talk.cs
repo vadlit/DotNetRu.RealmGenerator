@@ -21,9 +21,6 @@
         public string SlidesUrl { get; set; }
 
         public string VideoUrl { get; set; }
-
-        [Backlink(nameof(RealmModels.Meetup.Talks))]
-        public IQueryable<Meetup> Meetup { get; }
     }
 }
 

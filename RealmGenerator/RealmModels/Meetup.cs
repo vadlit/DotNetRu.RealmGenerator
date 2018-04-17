@@ -14,12 +14,10 @@
 
         public string CommunityId { get; set; }
 
-        public DateTimeOffset Date { get; set; }
-
         public IList<Friend> Friends { get; }
 
         public Venue Venue { get; set; }
 
-        public IList<Talk> Talks { get; }
+        public IList<Session> Sessions { get; }
     }
 }

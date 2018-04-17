@@ -20,9 +20,7 @@
         {
             IList<int> dummy = new List<int>();
 
-            var commitHash = "332cff30d041aaf991579f10b5578206e1f28601";
-
-            var auditVersion = new AuditVersion { CommitHash = commitHash };
+            string commitHash;// = "332cff30d041aaf991579f10b5578206e1f28601";
 
             using (var auditRepo = new Repository(AuditHelper.AuditPath))
             {
@@ -33,12 +31,14 @@
                     new Signature("RealmGenerator", "realm", DateTimeOffset.Now),
                     new PullOptions());
 
-                var commit = auditRepo.Commits.Single(x => x.Sha == auditVersion.CommitHash);
+                commitHash = auditRepo.Commits.First().Sha;
 
-                Commands.Checkout(auditRepo, commit);
+                Commands.Checkout(auditRepo, commitHash);
             }
 
-            string realmDirectoryPath = @"C:\Users\User\Source\Repos\App\DotNetRu.DataStore.Audit";
+            var auditVersion = new AuditVersion { CommitHash = commitHash };
+
+            string realmDirectoryPath = $@"C:\Users\{Environment.UserName}\Source\Repos\App\DotNetRu.DataStore.Audit";
             CleanDirectory(realmDirectoryPath);
 
             var config = new RealmConfiguration(Path.Combine(realmDirectoryPath, "Audit.realm"));
@@ -87,13 +87,19 @@
                                 dest.Speakers.Add(speaker);
                             }
                         });
+                    cfg.CreateMap<SessionEntity, Session>();
                     cfg.CreateMap<MeetupEntity, Meetup>().AfterMap(
                         (src, dest) =>
                         {
-                            foreach (string talkId in src.TalkIds)
+                            foreach (var session in src.Sessions)
                             {
-                                var talk = realm.Find<Talk>(talkId);
-                                dest.Talks.Add(talk);
+                                var realmSession = Mapper.Map<Session>(session);
+                                //realmSession.Meetup = dest;
+                                var talk = realm.Find<Talk>(session.TalkId);
+                                realmSession.Talk = talk;
+                                realm.Write(() => { realm.Add(realmSession); });
+                                var s = realm.Find<Session>(session.TalkId);
+                                dest.Sessions.Add(s);
                             }
 
                             foreach (string friendId in src.FriendIds)
@@ -111,6 +117,6 @@
         {
             File.Delete(Path.Combine(realmDirectoryPath, "Audit.realm"));
             File.Delete(Path.Combine(realmDirectoryPath, "Audit.realm.lock"));
-        }       
+        }
     }
 }
