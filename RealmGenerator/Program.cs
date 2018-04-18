@@ -20,7 +20,9 @@
         {
             IList<int> dummy = new List<int>();
 
-            string commitHash;// = "332cff30d041aaf991579f10b5578206e1f28601";
+            var commitHash = "332cff30d041aaf991579f10b5578206e1f28601";
+
+            var auditVersion = new AuditVersion { CommitHash = commitHash };
 
             using (var auditRepo = new Repository(AuditHelper.AuditPath))
             {
@@ -31,12 +33,10 @@
                     new Signature("RealmGenerator", "realm", DateTimeOffset.Now),
                     new PullOptions());
 
-                commitHash = auditRepo.Commits.First().Sha;
+                var commit = auditRepo.Commits.Single(x => x.Sha == auditVersion.CommitHash);
 
-                Commands.Checkout(auditRepo, commitHash);
+                Commands.Checkout(auditRepo, commit);
             }
-
-            var auditVersion = new AuditVersion { CommitHash = commitHash };
 
             string realmDirectoryPath = $@"C:\Users\{Environment.UserName}\Source\Repos\App\DotNetRu.DataStore.Audit";
             CleanDirectory(realmDirectoryPath);
@@ -91,30 +91,21 @@
                     cfg.CreateMap<MeetupEntity, Meetup>().AfterMap(
                         (src, dest) =>
                         {
-                            realm.Write(() =>
+                            foreach (var sessionEntity in src.Sessions)
                             {
-                                foreach (var session in src.Sessions)
-                                {
-                                    var realmSession = Mapper.Map<Session>(session);
-                                    var talk = realm.Find<Talk>(session.TalkId);
+                                var talk = realm.Find<Talk>(sessionEntity.TalkId);
+                                var realmSession = Mapper.Map<Session>(sessionEntity);
+                                realmSession.Talk = talk;
+                                dest.Sessions.Add(realmSession);
+                            }
 
-                                    realmSession.Talk = talk;
-                                    talk.Session = realmSession;
-                                    realmSession.Meetup = dest;
-                                    
-                                    var s = realm.Add(realmSession);
-                                    dest.Sessions.Add(s);
+                            foreach (string friendId in src.FriendIds)
+                            {
+                                var friend = realm.Find<Friend>(friendId);
+                                dest.Friends.Add(friend);
+                            }
 
-                                }
-
-                                foreach (string friendId in src.FriendIds)
-                                {
-                                    var friend = realm.Find<Friend>(friendId);
-                                    dest.Friends.Add(friend);
-                                }
-
-                                dest.Venue = realm.Find<Venue>(src.VenueId);
-                            });
+                            dest.Venue = realm.Find<Venue>(src.VenueId);
                         });
                 });
         }
