@@ -1,5 +1,6 @@
 ﻿namespace RealmGenerator
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
@@ -7,7 +8,7 @@
 
     public class AuditHelper
     {
-        public const string AuditPath = @"C:\Users\User\source\repos\Audit";
+        public static readonly string AuditPath = $@"C:\Users\{Environment.UserName}\source\repos\Audit";
 
         public static T LoadFromFile<T>(string path)
         {
