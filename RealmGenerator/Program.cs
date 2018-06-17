@@ -20,7 +20,7 @@
         {
             IList<int> dummy = new List<int>();
 
-            var commitHash = "332cff30d041aaf991579f10b5578206e1f28601";
+            var commitHash = "45d858e17a2f804bfd3691f260531638758508cd";
 
             var auditVersion = new AuditVersion { CommitHash = commitHash };
 
@@ -87,26 +87,26 @@
                                 dest.Speakers.Add(speaker);
                             }
                         });
-                    cfg.CreateMap<SessionEntity, Session>();
-                    cfg.CreateMap<MeetupEntity, Meetup>().AfterMap(
+                    cfg.CreateMap<SessionEntity, Session>().AfterMap(
                         (src, dest) =>
-                        {
-                            foreach (var sessionEntity in src.Sessions)
                             {
-                                var talk = realm.Find<Talk>(sessionEntity.TalkId);
-                                var realmSession = Mapper.Map<Session>(sessionEntity);
-                                realmSession.Talk = talk;
-                                dest.Sessions.Add(realmSession);
-                            }
+                                dest.Talk = realm.Find<Talk>(src.TalkId);
+                            });
+                    cfg.CreateMap<MeetupEntity, Meetup>()
+                        .ForMember(
+                            dest => dest.Sessions,
+                            o => o.ResolveUsing((src, dest, sessions, context) => context.Mapper.Map(src.Sessions, dest.Sessions)))
+                        .AfterMap(
+                            (src, dest) =>
+                                {
+                                    foreach (string friendId in src.FriendIds)
+                                    {
+                                        var friend = realm.Find<Friend>(friendId);
+                                        dest.Friends.Add(friend);
+                                    }
 
-                            foreach (string friendId in src.FriendIds)
-                            {
-                                var friend = realm.Find<Friend>(friendId);
-                                dest.Friends.Add(friend);
-                            }
-
-                            dest.Venue = realm.Find<Venue>(src.VenueId);
-                        });
+                                    dest.Venue = realm.Find<Venue>(src.VenueId);
+                                });
                 });
         }
 
