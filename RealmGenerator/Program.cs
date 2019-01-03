@@ -20,23 +20,29 @@
         {
             IList<int> dummy = new List<int>();
 
+            var checkoutMaster = true;
             var commitHash = "45d858e17a2f804bfd3691f260531638758508cd";
 
-            var auditVersion = new AuditVersion { CommitHash = commitHash };
+            var auditRepoPath = Path.Combine(Path.GetTempPath(), "Audit");
 
-            using (var auditRepo = new Repository(AuditHelper.AuditPath))
+            Repository.Clone("https://github.com/DotNetRu/Audit.git", auditRepoPath);
+
+            var auditVersion = new AuditVersion();
+
+            using (var auditRepo = new Repository(auditRepoPath))
             {
-                Commands.Checkout(auditRepo, "master");
-
-                Commands.Pull(
-                    auditRepo,
-                    new Signature("RealmGenerator", "realm", DateTimeOffset.Now),
-                    new PullOptions());
+                if (checkoutMaster)
+                {
+                    auditVersion.CommitHash = auditRepo.Head.Commits.First().Sha;
+                }
+                else
+                {
+                    auditVersion.CommitHash = commitHash;
+                }
 
                 var commit = auditRepo.Commits.Single(x => x.Sha == auditVersion.CommitHash);
-
                 Commands.Checkout(auditRepo, commit);
-            }
+            }            
 
             string realmDirectoryPath = $@"C:\Users\{Environment.UserName}\Source\Repos\App\DotNetRu.DataStore.Audit";
             CleanDirectory(realmDirectoryPath);
@@ -95,7 +101,7 @@
                     cfg.CreateMap<MeetupEntity, Meetup>()
                         .ForMember(
                             dest => dest.Sessions,
-                            o => o.ResolveUsing((src, dest, sessions, context) => context.Mapper.Map(src.Sessions, dest.Sessions)))
+                            o => o.MapFrom((src, dest, sessions, context) => context.Mapper.Map(src.Sessions, dest.Sessions)))
                         .AfterMap(
                             (src, dest) =>
                                 {
