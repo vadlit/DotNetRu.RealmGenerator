@@ -12,6 +12,8 @@
 
         public IList<Speaker> Speakers { get; }
 
+        public IList<string> SeeAlsoTalksIds { get; }
+
         public string Title { get; set; }
 
         public string Description { get; set; }
