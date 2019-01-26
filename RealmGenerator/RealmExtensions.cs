@@ -6,10 +6,10 @@
 
     public static class RealmExtensions
     {
-        public static void AddEntities<TEntity, TRealmType>(this Realm realm, string folderPath)
+        public static void AddEntities<TEntity, TRealmType>(this Realm realm, AuditFilesLoader filesLoader, string folderPath)
             where TRealmType : RealmObject
         {
-            foreach (TEntity entity in AuditHelper.GetEntities<TEntity>(folderPath))
+            foreach (TEntity entity in filesLoader.GetEntities<TEntity>(folderPath))
             {
                 var realmObject = Mapper.Map<TRealmType>(entity);
 
