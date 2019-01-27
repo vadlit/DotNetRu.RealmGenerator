@@ -19,7 +19,9 @@
 
         public string BlogUrl { get; set; }
 
-        public string TwitterUrl { get; set; }
+        public string TwitterUrl { get; set; }        
+
+        public string GitHubUrl { get; set; }
 
         public string HabrUrl { get; set; }
 

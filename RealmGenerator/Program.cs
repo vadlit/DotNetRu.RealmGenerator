@@ -46,7 +46,7 @@ namespace RealmGenerator
                 Commands.Checkout(auditRepo, commit);
             }            
 
-            Console.WriteLine("Generating realm...");
+            Console.WriteLine("Generating realm for {0}...", auditVersion.CommitHash);
             string realmDirectoryPath = $@"C:\Users\{Environment.UserName}\Source\Repos\App\DotNetRu.DataStore.Audit";
             Directory.CreateDirectory(realmDirectoryPath);
             CleanDirectory(realmDirectoryPath);
@@ -66,7 +66,7 @@ namespace RealmGenerator
             realm.AddEntities<TalkEntity, Talk>(filesLoader, "talks");
             realm.AddEntities<MeetupEntity, Meetup>(filesLoader, "meetups");
 
-            Console.WriteLine("Finished!");
+            Console.WriteLine("Finished! Realm generated at {0}. Press any key to exit.", realmDirectoryPath);
             Console.ReadKey();
         }
 
