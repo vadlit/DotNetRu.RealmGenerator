@@ -1,19 +1,18 @@
-﻿namespace RealmGenerator
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
-    using AutoMapper;
+using AutoMapper;
 
-    using LibGit2Sharp;
+using LibGit2Sharp;
 
-    using RealmGenerator.Entities;
-    using RealmGenerator.RealmModels;
+using RealmGenerator.Entities;
+using RealmGenerator.RealmModels;
+using Realms;
 
-    using Realms;
-
+namespace RealmGenerator
+{    
     public class Program
     {
         public static void Main(string[] args)
@@ -23,10 +22,13 @@
             var checkoutMaster = true;
             var commitHash = "45d858e17a2f804bfd3691f260531638758508cd";
 
-            var auditRepoPath = Path.Combine(Path.GetTempPath(), "Audit");
+            var auditRepoPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString(), "Audit");
+            var filesLoader = new AuditFilesLoader(auditRepoPath);
 
+            Console.WriteLine("Downloading audit from Git...");            
             Repository.Clone("https://github.com/DotNetRu/Audit.git", auditRepoPath);
 
+            Console.WriteLine("Checking out...");
             var auditVersion = new AuditVersion();
 
             using (var auditRepo = new Repository(auditRepoPath))
@@ -44,7 +46,9 @@
                 Commands.Checkout(auditRepo, commit);
             }            
 
+            Console.WriteLine("Generating realm...");
             string realmDirectoryPath = $@"C:\Users\{Environment.UserName}\Source\Repos\App\DotNetRu.DataStore.Audit";
+            Directory.CreateDirectory(realmDirectoryPath);
             CleanDirectory(realmDirectoryPath);
 
             var config = new RealmConfiguration(Path.Combine(realmDirectoryPath, "Audit.realm"));
@@ -53,17 +57,20 @@
 
             realm.Write(() => { realm.Add(auditVersion); });
 
-            InitializeAudoMapper(realm);
+            InitializeAudoMapper(realm, filesLoader);
 
-            realm.AddEntities<SpeakerEntity, Speaker>("speakers");
-            realm.AddEntities<FriendEntity, Friend>("friends");
-            realm.AddEntities<VenueEntity, Venue>("venues");
-            realm.AddEntities<CommunityEntity, Community>("communities");
-            realm.AddEntities<TalkEntity, Talk>("talks");
-            realm.AddEntities<MeetupEntity, Meetup>("meetups");
+            realm.AddEntities<SpeakerEntity, Speaker>(filesLoader, "speakers");
+            realm.AddEntities<FriendEntity, Friend>(filesLoader, "friends");
+            realm.AddEntities<VenueEntity, Venue>(filesLoader, "venues");
+            realm.AddEntities<CommunityEntity, Community>(filesLoader, "communities");
+            realm.AddEntities<TalkEntity, Talk>(filesLoader, "talks");
+            realm.AddEntities<MeetupEntity, Meetup>(filesLoader, "meetups");
+
+            Console.WriteLine("Finished!");
+            Console.ReadKey();
         }
 
-        private static void InitializeAudoMapper(Realm realm)
+        private static void InitializeAudoMapper(Realm realm, AuditFilesLoader filesLoader)
         {
             Mapper.Initialize(
                 cfg =>
@@ -71,7 +78,7 @@
                     cfg.CreateMap<SpeakerEntity, Speaker>().AfterMap(
                         (src, dest) =>
                         {
-                            dest.Avatar = AuditHelper.LoadImage("speakers", src.Id, "avatar.jpg");
+                            dest.Avatar = filesLoader.LoadImage("speakers", src.Id, "avatar.jpg");
                         });
                     cfg.CreateMap<VenueEntity, Venue>();
                     cfg.CreateMap<FriendEntity, Friend>().AfterMap(
@@ -79,8 +86,8 @@
                         {
                             var friendId = src.Id;
 
-                            dest.LogoSmall = AuditHelper.LoadImage("friends", friendId, "logo.small.png");
-                            dest.Logo = AuditHelper.LoadImage("friends", friendId, "logo.png");
+                            dest.LogoSmall = filesLoader.LoadImage("friends", friendId, "logo.small.png");
+                            dest.Logo = filesLoader.LoadImage("friends", friendId, "logo.png");
                         });
                     cfg.CreateMap<CommunityEntity, Community>();
                     cfg.CreateMap<TalkEntity, Talk>().AfterMap(
@@ -91,6 +98,14 @@
                                 var speaker = realm.Find<Speaker>(speakerId);
 
                                 dest.Speakers.Add(speaker);
+                            }
+
+                            if (src.SeeAlsoTalkIds != null)
+                            {
+                                foreach (string talkId in src.SeeAlsoTalkIds)
+                                {                                    
+                                    dest.SeeAlsoTalksIds.Add(talkId);
+                                }
                             }
                         });
                     cfg.CreateMap<SessionEntity, Session>().AfterMap(
